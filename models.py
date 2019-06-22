@@ -258,10 +258,7 @@ class Post(Base):
         back_populates='user_post'
     )
     post_comment = relationship(
-        'Comment',
-        back_populates='post',
-        lazy=True,
-        uselist=False
+        'Comment'
     )
     title = Column(
         'title',
@@ -341,10 +338,6 @@ class Comment(Base):
         Integer,
         ForeignKey('post.id'),
         nullable=False
-    )
-    post = relationship(
-        'Post',
-        back_populates='post_comment'
     )
     user_comment_id = Column(
         Integer,

@@ -4,7 +4,8 @@
     <title>Conduent Hackathon 2019</title>
     <link rel="stylesheet" href="/static/css/blog.css">
     <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
-    <script type="text" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.4/socket.io.min.js" ></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.4/socket.io.min.js" ></script>
 </head>
 
 <body>
@@ -28,9 +29,20 @@
                 </div>
             </div>
             <div style="align-self:flex-end; margin-right:2vw;">
-                <p class="post-upvote">{{ post.upvote }}</p>
+                <p class="post-upvote-{{post.id}}">{{ post.upvote }}</p>
                 <i class='far fa-arrow-alt-circle-up' style='font-size:24px; cursor: pointer;' onclick="upvote({{ post.id }})"></i>
                 <i class='far fa-arrow-alt-circle-down' style='font-size:24px; cursor: pointer;' onclick="downvote({{ post.id }})"></i>
+            </div>
+            <div class="comments-{{post.id}}">
+                {% if post.post_comment  %}
+                    {%  for comment in post.post_comment %}
+                        <p>{{ comment.content }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div style="display: flex; justify-content: space-around; margin-top:50px; margin-bottom:20px;">
+                <input type="text" id="comment-text-{{ post.id }}" style="width:50vw;" />
+                <button class="btn" onclick="comment({{ post.id }})">comment</button>
             </div>
         </div>
     </div>
@@ -42,13 +54,27 @@
     var socket = io.connect('http://127.0.0.1:5000');
     
     socket.on('message', function(msg){
-        $('.post-upvote').html(msg);
+        if(msg['func_type'] == 'vote'){
+            var cls = '.post-upvote-'+msg['post_id'];
+            $(cls).html(msg['upvote']);
+        }
+        if(msg['func_type'] == 'comment'){
+            console.log(msg);
+            var cls = '.comments-'+msg['post_id'];
+            $(cls).html('');
+            var comment = '';
+            for(var key in msg['comments']){
+                comment += '<p>'+ msg['comments'][key]['content'] + '</p>';
+            }
+            $(cls).html(comment);
+        }
     });
 
     function upvote(e){
         var message = {};
         message['post_id'] = e;
         message['type'] = 'upvote';
+        message['func_type'] = 'vote';
         socket.send(message);
     }
 
@@ -56,7 +82,18 @@
         var message = {};
         message['post_id'] = e;
         message['type'] = 'downvote';
+        message['func_type'] = 'vote';
         socket.send(message);
+    }
+
+    function comment(e){
+        var id = '#comment-text-'+e;
+        var message = {};
+        message['comment'] = $(id).val();
+        message['post_id'] = e;
+        message['func_type'] = 'comment';
+        message['user_id'] = '{{ user.id }}';
+        socket.send(message)
     }
 
 </script>

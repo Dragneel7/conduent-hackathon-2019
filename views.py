@@ -27,11 +27,14 @@ from flask import (
     jsonify
 )
 
+# import modules from flask_socketio
+from flask_socketio import send
+
 # import modules from sqlalchemy
 from sqlalchemy.sql.expression import true
 
 # import application modules
-from app import app
+from app import app, socketio
 from models import (
     User,
     UserDetail,
@@ -120,13 +123,11 @@ def get_common_posts():
     """
 
     user_id = flask_session.get('user_id')
-    print(user_id)
     user = User().get(user_id)
     posts = Post().get_all()
     context = {}
     context['posts'] = posts
     context['user'] = user
-    print(context)
     return render_template('common_post.html', **context)
 
 
@@ -155,6 +156,7 @@ def add_new_post():
             title=data['title'],
             image=data['image'],
             content=data['content'],
+            upvote=0,
             posted_on=datetime.now()
         )
         post.create()
@@ -166,40 +168,87 @@ def add_new_post():
 
 
 # define Post Upvote views.
-@app.route('/upvote', methods=['POST'])
-def upvote_post():
-    """ Increase or decrease user post upvote count.
+@socketio.on('message')
+def trigger_socket_function(msg_obj):
+    """ Triggers the function based on the msg_obj param func_type.
+
+    :param msg_obj: Details of the message and the function to trigger.
+    :param type: dict
+    :rparam send_obj: Upvote count or comment message.
+    :rtype: String
     """
 
-    if request.method == 'POST':
-        post_id = request.json['post_id']
-        vote_type = request.json['type']
-        post = Post().get(post_id)
-        if vote_type == 'upvote':
-            post.upvote += 1
-        elif vote_type == 'downvote':
-            post.upvote -= 1
-        post.save()
-        post_user = post.get_post_user(post_id)
-        post_user_wallet = UserWallet().get(post_user.id)
-        post_user_wallet.virtual_value = post.upvote
-        post_user_wallet.save()  
+    if(msg_obj['func_type'] == 'vote'):
+        send_obj = dict(
+            upvote=upvote_post(msg_obj),
+            post_id=msg_obj['post_id'],
+            func_type=msg_obj['func_type']
+        )
+    else:
+        send_obj = dict(
+            comments=add_new_comment(msg_obj),
+            post_id=msg_obj['post_id'],
+            func_type=msg_obj['func_type']
+        )
+        print("************")
+        print(send_obj)
+    send(send_obj, broadcast=True)
+
+
+def upvote_post(msg_obj):
+    """ Increase or decrease user post upvote count.
+
+    :param msg_obj: Details of the post user want to upvote.
+    :param type: dict
+    """
+
+    post_id = msg_obj['post_id']
+    vote_type = msg_obj['type']
+    post = Post().get(post_id)
+    if vote_type == 'upvote':
+        post.upvote += 1
+    elif vote_type == 'downvote':
+        post.upvote -= 1
+    post.save()
+    post_user = post.get_post_user(post_id)
+    #post_user_wallet = UserWallet().get(post_user.id)
+    #post_user_wallet.virtual_value = post.upvote
+    #post_user_wallet.save()
+    return post.upvote
 
 
 # define Comment views
-@app.route('/add/comment', methods=['POST'])
-def add_new_comment():
-    """ Adds new comment to a post.
-    """
+def serialize_comment(comments):
+    """ Serialize the comments in JSON format.
 
-    if request.method == 'POST':
-        data = request.form()
-        comment = Comment(
-            post_comment_id=data['post_id'],
-            user_comment_id=data['user_id'],
-            content=data['content']
-        )
-        comment.create()
+    :param comments: list of comments for a post.
+    :param type: list
+    """
+    comment_dict = {}
+    i=0
+    for comment in comments:
+        i += 1
+        comment_thread = {}
+        comment_thread['content'] = comment.content
+        comment_dict['comment' + str(i)] = comment_thread
+    return comment_dict
+
+
+def add_new_comment(msg_obj):
+    """ Adds new comment to a post.
+
+    :param msg_obj: Details of the post user want to comment.
+    :param type: dict
+    """
+    comment = Comment(
+        post_comment_id=msg_obj['post_id'],
+        user_comment_id=msg_obj['user_id'],
+        content=msg_obj['comment']
+    )
+    comment.create()
+    comments = Post().get(msg_obj['post_id']).post_comment
+    comments = serialize_comment(comments)
+    return comments
 
 
 # define Utility views
@@ -367,4 +416,4 @@ def get_utility_item_sold_info(utility_id):
     return render_template('utility_items_sold.html', **context)
 
 if __name__ == "__main__":
-    app.run()
+    socketio.run(app)
