@@ -1,0 +1,28 @@
+<html>
+
+<head>
+    <title>IMG Workshop '18</title>
+    <link rel="stylesheet" href="/static/css/blog.css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-sm">
+        <a class="navbar-brand" href="{{ url_for('home') }}"> <h3>Xena</h3> </a>
+        <a href="{{ url_for('get_common_posts') }}"><h6>Posts</h6></a>
+        <a href="{{ url_for('get_all_utilities') }}"><h6>Utilities</h6></a>
+    </nav>
+
+    <div class="container card col-sm-7">
+        <h1>List of all the items sold by a Utility.</h1>
+        {% if items %}
+            {% for item in items %}
+                {{ item.utility_id }}
+            {% endfor %}
+        {% endif %}
+    </div>
+
+</body>
+
+</html>
+

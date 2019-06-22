@@ -94,18 +94,6 @@ class User(Base):
         unique=True,
         nullable=False
     )
-    private_key = Column(
-        'private_key',
-        String(512),
-        unique=True,
-        nullable=False
-    )
-    public_key = Column(
-        'public_key',
-        String(512),
-        unique=True,
-        nullable=False
-    )
 
     # define methods for User Class
     def __init__(self, **kwargs):
@@ -124,6 +112,16 @@ class User(Base):
         :param type: int
         """
         return session.query(User).filter(User.id == id).first()
+
+    def login(self, username, password):
+        """ Logs in a user.
+
+        :param username: Username for the user to be logged in.
+        :param type: String
+        :param password: Password for the logged in your.
+        :param type: String
+        """
+        return session.query(User).filter(and_(User.username == username,User.password == password )).first()
 
 
 class UserDetail(Base):
@@ -207,11 +205,6 @@ class UserWallet(Base):
         Integer,
         default=0
     )
-    virtual_coin = Column(
-        'virtual_coin',
-        Integer,
-        default=False
-    )
     virtual_value = Column(
         'virtual_value',
         Integer,
@@ -222,6 +215,12 @@ class UserWallet(Base):
     def __init__(self, **kwargs):
         super(UserWallet, self).__init__(**kwargs)
     
+    def create(self):
+        """ Creates a new user wallet.
+        """
+        session.add(self)
+        session.commit()
+
     def get(self, id):
         """ Returns user wallet info based on id.
         """
@@ -230,6 +229,14 @@ class UserWallet(Base):
     def save(self):
         """ Saves the updated wallet status.
         """
+        session.commit()
+
+    def successful_mine(self, id):
+        """ Add virtual value in the user's wallet for successful verification of the
+            transaction.
+        """
+        user_wallet = session.query(UserWallet).filter(UserWallet.user_wallet_id == id).first()
+        user_wallet.virtual_value += 10
         session.commit()
 
 
@@ -310,7 +317,8 @@ class Post(Base):
     def get_post_user(self, id):
         """ Returns information of the user who authored the post.
         """
-        return session.query(Post).filter(Post.user_post_id == id).first()
+        post = session.query(Post).filter(Post.id == id).first()
+        return post.user_post_id
 
 
 class Comment(Base):
@@ -444,6 +452,12 @@ class Utility(Base):
         """ Gets user id owned utilities.
         """
         return session.query(Utility).filter(Utility.user_utility_id == id).all()
+    
+    def get_owner(self, id):
+        """ Returns the id for the utility owner.
+        """
+        owner = session.query(Utility).filter(Utility.id == id).first()
+        return owner.id
 
 
 class UtilityItem(Base):
@@ -490,6 +504,12 @@ class UtilityItem(Base):
         """
         session.add(self)
         session.commit()
+    
+    def get_price(self, id):
+        """ Gets the item price.
+        """
+        item = session.query(UtilityItem).filter(UtilityItem.id == id).first()
+        return item.price
 
 
 class UtilityItemUser(Base):
@@ -516,6 +536,11 @@ class UtilityItemUser(Base):
         'utility_item_id',
         Integer
     )
+    transaction_registered = Column(
+        'transaction_registered',
+        String(255),
+        default="false"
+    )
 
     # define methods for Utility model
     def __init__(self, **kwargs):
@@ -528,6 +553,18 @@ class UtilityItemUser(Base):
         session.commit()
 
     def get_for_utility(self, id):
-        """ Gets all the users who bought from utility.
+        """ Gets all the users who bought from utility and have registered transactions.
         """
-        return 0
+        return session.query(UtilityItemUser).filter(and_(UtilityItemUser.utility_id == id, UtilityItemUser.transaction_registered == "true")).all()
+
+    def get_unregistered_transactions(self):
+        """ Returns all the transactions that are unregistered.
+        """
+        return session.query(UtilityItemUser).filter(UtilityItemUser.transaction_registered == "false").all()
+
+    def register(self, id):
+        """ Register the successfully mined transaction.
+        """
+        transaction = session.query(UtilityItemUser).filter(UtilityItemUser.id == id).first()
+        transaction.transaction_registered = "true"
+        session.commit()

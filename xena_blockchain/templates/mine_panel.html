@@ -1,0 +1,74 @@
+<html>
+
+<head>
+    <title>IMG Workshop '18</title>
+    <link rel="stylesheet" href="/static/blog.css">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-sm">
+        <a class="navbar-brand" href="http://localhost:5000/"> <h3>Xena</h3> </a>
+    </nav>
+    <div class="container" style="display:flex; justify-content:space-around">
+        <div class="container card col-sm-4 unregistered">
+            
+        </div>
+
+        <div class="container card col-sm-6">
+            
+            <form action="{{ url_for('mine_block') }}" method='POST'>
+                    <div class="form-header">
+                        <h3> Mine for transaction </h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="transaction_sender_id">Sender Id :</label>
+                        <input type="text" id="post_title" name="transaction_sender_id" class="form-control"/>
+                    </div>
+                    <!-- Blog Content field -->
+                    <div class="form-group">
+                        <label for="transaction_recipient_id">Receiver :</label>
+                        <input type="text" id="content" name="transaction_recipient_id" class="form-control" />
+                    </div>
+                    <!-- Blog Content field -->
+                    <div class="form-group">
+                            <label for="amount">Amount :</label>
+                            <input type="text" id="content" name="amount" class="form-control" />
+                    </div>
+                    <!-- Blog Content field -->
+                    <div class="form-group">
+                            <label for="transaction_id">transaction_id :</label>
+                            <input type="text" id="content" name="transaction_id" class="form-control" />
+                    </div>
+                    <!-- Submit form to DataBase -->
+                    <input type="submit" class="btn" value="Mine"/>
+            </form>
+        
+        </div>
+    </div>
+</body>
+
+<script>
+
+    // get unregistered transactions after every 5 secs.
+    function get_unregistered_transactions(){
+        (function worker() {
+            $.ajax({
+                url: 'http://localhost:5000/get_unregistered_transactions', 
+                success: function(data) {
+                $('.unregistered').html(JSON.stringify(data));
+                },
+                complete: function() {
+                // Schedule the next request when the current one's complete
+                setTimeout(worker, 5000);
+                }
+            });
+        })();
+    }
+
+    get_unregistered_transactions();
+
+</script>
+
+</html>

@@ -36,6 +36,7 @@ from sqlalchemy.sql.expression import true
 # import application modules
 from app import app, socketio
 from models import (
+    session,
     User,
     UserDetail,
     UserWallet,
@@ -57,6 +58,24 @@ def home():
     return render_template('index.html', **context)
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login_user():
+    """ Log in a registered user.
+    """
+
+    if request.method == "POST":
+        data = request.form
+        if User().login(data['username'], data['password']):
+            return redirect(
+                url_for('get_common_posts')
+            )
+        else:
+            return redirect(
+                url_for('register')
+            )
+    else:
+        return render_template('login.html')
+
 # define User registerations views
 @app.route('/register', methods=['GET'])
 def register():
@@ -75,15 +94,18 @@ def register_user():
 
     if request.method == 'POST':
         data = request.form  # access form data from request.
-        print(data)
         new_user = User(
             username=data['username'],
             password=data['password'],
-            email=data['email'],
-            private_key='<USERS_PRIVATE_KEY>',
-            public_key='<USERS_PUBLIC_KEY>'
+            email=data['email']
         )
         new_user.create()  # create new user in DB.
+        new_user_wallet = UserWallet(
+            user_wallet_id=new_user.id,
+            socail_score=0,
+            virtual_value=0
+        )
+        new_user_wallet.create()
         context = {}
         context['user'] = new_user
         flask_session['user_id'] = new_user.id
@@ -208,10 +230,11 @@ def upvote_post(msg_obj):
     elif vote_type == 'downvote':
         post.upvote -= 1
     post.save()
-    post_user = post.get_post_user(post_id)
-    #post_user_wallet = UserWallet().get(post_user.id)
-    #post_user_wallet.virtual_value = post.upvote
-    #post_user_wallet.save()
+    post_user_id = post.get_post_user(post_id)
+    post_user_wallet = UserWallet().get(post_user_id)
+    post_user_wallet.virtual_value = post.upvote
+    post_user_wallet.socail_score = post.upvote
+    post_user_wallet.save()
     return post.upvote
 
 
@@ -366,7 +389,7 @@ def add_utility_item():
 
 # defines views to buy utility Item
 @app.route('/buy_utility_item/<utility_id>/<item_id>', methods=['GET'])
-def buy_utility_item(utility_id, item_id, user_id):
+def buy_utility_item(utility_id, item_id):
     """ Buys the utility item for the user.
     
     :param utility_id: Id of the utility owning the item.
@@ -377,19 +400,20 @@ def buy_utility_item(utility_id, item_id, user_id):
 
     user_id = flask_session.get('user_id')
     user_item_rel = UtilityItemUser(
-        user_id='user_id',
-        utility_id='utility_id',
-        utility_item_id='utility_item_id'
+        user_id=user_id,
+        utility_id=utility_id,
+        utility_item_id=item_id,
+        transaction_registered="false"
     )
     user_item_rel.create()
     user_wallet = UserWallet().get(user_id)
-    utility_item = UtilityItem.get(item_id)
-    user_wallet.virtual_value -= utility_item.price
+    utility_item_price = UtilityItem().get_price(item_id)
+    user_wallet.virtual_value -= utility_item_price
     user_wallet.save()
     return redirect(
             url_for(
                 'get_utility',
-                utility_id=request.json['utility_id']
+                utility_id=utility_id
             )
         )
 
@@ -413,11 +437,34 @@ def get_utility_item_sold_info(utility_id):
     """ Returns the information of the items sold by the utility.
     """
 
-    items_sold = UtilityItemUser.get_for_utility(utility_id)
+    items_sold = UtilityItemUser().get_for_utility(utility_id)
     context = dict(
         items=items_sold
     )
-    return render_template('utility_items_sold.html', **context)
+    return render_template('utility_sold_items.html', **context)
+
+
+@app.route('/get_unregistered_transactions', methods=['GET'])
+def get_unregistered_tran():
+    """ Returns all the unregistered transactions to send for mining.
+    """
+    
+    transactions = UtilityItemUser().get_unregistered_transactions()
+    transactions_dict = {}
+    i = 0
+    for transaction in transactions:
+        i += 1
+        trans = {}
+        trans['sender_id'] = transaction.user_id
+        trans['transaction_id'] = transaction.id
+        reciever_id = Utility().get_owner(transaction.utility_id)
+        amount = UtilityItem().get_price(transaction.utility_item_id)
+        trans['amount'] = amount
+        trans['reciever'] = reciever_id
+        transactions_dict['trans' + str(i)] = trans
+    return jsonify(transactions_dict)
+ 
 
 if __name__ == "__main__":
+    session.rollback()
     socketio.run(app)
