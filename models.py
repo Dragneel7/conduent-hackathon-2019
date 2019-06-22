@@ -55,6 +55,12 @@ class User(Base):
         unique=True,
         nullable=False
     )
+    password = Column(
+        'password',
+        String(255),
+        unique=False,
+        nullable=False
+    )
     user_detail = relationship(
         'UserDetail',
         back_populates='user',
@@ -75,6 +81,12 @@ class User(Base):
     )
     user_comment = relationship(
         'Comment',
+        back_populates='user',
+        lazy=True,
+        uselist=False
+    )
+    user_utility = relationship(
+        'Utility',
         back_populates='user',
         lazy=True,
         uselist=False
@@ -101,6 +113,20 @@ class User(Base):
     # define methods for User Class
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
+
+    def create(self):
+        """ Saves new user to the database.
+        """
+        session.add(self)
+        session.commit()
+
+    def get(self, id):
+        """ Returns the user data for the specified id.
+        
+        :param id: id for the request user.
+        :param type: int
+        """
+        return session.query(User).filter(User.id == id).first()
 
 
 class UserDetail(Base):
@@ -151,6 +177,12 @@ class UserDetail(Base):
     def __init__(self, **kwargs):
         super(UserDetail, self).__init__(**kwargs)
 
+    def create(self):
+        """ Save user details in DB.
+        """
+        session.add(self)
+        session.commit()
+
 
 class UserWallet(Base):
     """ UserWallet model to store SocialScore and Virtual Value.
@@ -192,6 +224,16 @@ class UserWallet(Base):
     #define UserWallet model methods
     def __init__(self, **kwargs):
         super(UserWallet).__init__(**kwargs)
+    
+    def get(self, id):
+        """ Returns user wallet info based on id.
+        """
+        return session.query(UserWallet).filter(UserWallet.user_wallet_id == id).first()
+    
+    def save(self):
+        """ Saves the updated wallet status.
+        """
+        session.commit()
 
 
 class Post(Base):
@@ -247,6 +289,35 @@ class Post(Base):
     def __init__(self, **kwargs):
         super(Post).__init__(**kwargs)
 
+    def create(self):
+        """ Saves new post to db.
+        """
+        session.add(self)
+        session.commit()
+
+    def get(self, id):
+        """ Returns the post data for the specified id.
+        
+        :param id: id for the requested post.
+        :param type: int
+        """
+        return session.query(Post).filter(Post.id == id).first()
+
+    def save(self):
+        """ Saves updated Post.
+        """
+        session.commit()
+
+    def get_all(self):
+        """ Return all posts from db.
+        """
+        return session.query(Post).all()
+
+    def get_post_user(self, id):
+        """ Returns information of the user who authored the post.
+        """
+        return session.query(Post).filter(Post.user_post_id == id).first()
+
 
 class Comment(Base):
     """ Comment model to store comments on a post.
@@ -294,6 +365,12 @@ class Comment(Base):
     def __init__(self, **kwargs):
         super(Comment, self).__init__(**kwargs)
 
+    def create(self):
+        """ Adds a new comment to db.
+        """
+        session.add(self)
+        session.commit()
+
 
 class Utility(Base):
     """ Utility model to store utility(shop) details.
@@ -317,6 +394,19 @@ class Utility(Base):
         String(512),
         nullable=False
     )
+    image = Column(
+        'image',
+        String(512)
+    )
+    user_utility_id = Column(
+        Integer,
+        ForeignKey('user.id'),
+        nullable=False
+    )
+    user = relationship(
+        'User',
+        back_populates='user_utility'
+    )
     utility_item = relationship(
         'Utility',
         back_populates='utility',
@@ -328,6 +418,11 @@ class Utility(Base):
         String(512),
         nullable=False
     )
+    approval_count = Column(
+        'approval_count',
+        Integer,
+        default=0
+    )
     registered = Column(
         'registered',
         BOOLEAN(),
@@ -337,6 +432,35 @@ class Utility(Base):
     # define methods for Utility model
     def __init__(self, **kwargs):
         super(Utility, self).__init__(**kwargs)
+
+    def create(self):
+        """ Adds new utility to db.
+        """
+        session.add(self)
+        session.commit()
+    
+    def get(self, id):
+        """ Returns the Utility data for the specified id.
+        
+        :param id: id for the requested Utility.
+        :param type: int
+        """
+        return session.query(Utility).filter(Utility.id == id).first()
+
+    def all(self):
+        """ Returns all utilities in db.
+        """
+        return session.query(Utility).all()
+    
+    def save(self):
+        """ Updates the Utility in db.
+        """
+        session.commit()
+
+    def get_user_utility(self, id):
+        """ Gets user id owned utilities.
+        """
+        return session.query(Utility).filter(Utility.user_utility_id == id).all()
 
 
 class UtilityItem(Base):
@@ -369,6 +493,10 @@ class UtilityItem(Base):
         'description',
         String(512)
     )
+    image = Column(
+        'image',
+        String(512)
+    )
     price = Column(
         'price',
         Integer
@@ -377,3 +505,39 @@ class UtilityItem(Base):
     # define methods for Utility model
     def __init__(self, **kwargs):
         super(UtilityItem, self).__init__(**kwargs)
+
+
+class UtilityItemUser(Base):
+    """ UtilityItemUser model to store the utility item bought by the user.
+    """
+
+    __tablename__ = 'utilityItemUser'
+
+    id =  Column(
+        'id',
+        Integer,
+        primary_key=True,
+        autoincrement=True
+    )
+    user_id = Column(
+        'user_id',
+        Integer
+    )
+    utility_id = Column(
+        'utility_id',
+        Integer
+    )
+    utility_item_id = Column(
+        'utility_item_id',
+        Integer
+    )
+
+    # define methods for Utility model
+    def __init__(self, **kwargs):
+        super(UtilityItemUser, self).__init__(**kwargs)
+
+    def create(self):
+        """ Save new utility item user relation in db.
+        """
+        session.add(self)
+        session.commit()
