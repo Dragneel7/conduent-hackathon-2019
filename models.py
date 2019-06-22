@@ -86,10 +86,7 @@ class User(Base):
         uselist=False
     )
     user_utility = relationship(
-        'Utility',
-        back_populates='user',
-        lazy=True,
-        uselist=False
+        'Utility'
     )
     email = Column(
         'email',
@@ -396,15 +393,8 @@ class Utility(Base):
         ForeignKey('user.id'),
         nullable=False
     )
-    user = relationship(
-        'User',
-        back_populates='user_utility'
-    )
     utility_item = relationship(
-        'UtilityItem',
-        back_populates='utility',
-        lazy=True,
-        uselist=False
+        'UtilityItem'
     )
     address = Column(
         'address',
@@ -474,10 +464,6 @@ class UtilityItem(Base):
         ForeignKey('utility.id'),
         nullable=False
     )
-    utility = relationship(
-        'Utility',
-        back_populates='utility_item'
-    )
     name = Column(
         'name',
         String(255)
@@ -498,6 +484,12 @@ class UtilityItem(Base):
     # define methods for Utility model
     def __init__(self, **kwargs):
         super(UtilityItem, self).__init__(**kwargs)
+
+    def create(self):
+        """ Saves a new utility item to db.
+        """
+        session.add(self)
+        session.commit()
 
 
 class UtilityItemUser(Base):
@@ -534,3 +526,8 @@ class UtilityItemUser(Base):
         """
         session.add(self)
         session.commit()
+
+    def get_for_utility(self, id):
+        """ Gets all the users who bought from utility.
+        """
+        return 0

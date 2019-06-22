@@ -1,0 +1,45 @@
+<html>
+
+<head>
+    <title>Conduent Blockchain Hackathon 2019</title>
+    <link rel="stylesheet" href="/static/css/blog.css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-sm">
+        <a class="navbar-brand" href="{{ url_for('home') }}"> <h3>Xena</h3> </a>
+        <a href="{{ url_for('get_all_utilities') }}"><h6>Utilities</h6></a>
+        <a href="#"><h6>Login</h6></a>
+    </nav>
+
+    <h3>{{ utility.name }}</h3>
+
+    <div class="col-sm-12" style="display: flex; justify-content: space-evenly; flex-flow: wrap;">
+        {% if utility.utility_item %}
+            {% for item in utility.utility_item %}
+                <div class="card" style="width:300px">
+                    <img class="card-img-top" src="http://localhost:5000/static/images/project/1.jpg" alt="Card image" style="width:100%">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ item.name }}</h4>
+                        <p class="card-text">{{ item.description }}</p>
+                        <div>
+                            <button class="btn" onclick="buy_item({{ utility.id }}, {{ item.id }})">Buy</button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</body>
+
+<script>
+
+    function buy_item(e, f){
+        window.location.href = "http://localhost:5000/buy_utility_item/"+e+"/"+f;
+    }
+
+
+</script>
+</html>
+

@@ -190,8 +190,6 @@ def trigger_socket_function(msg_obj):
             post_id=msg_obj['post_id'],
             func_type=msg_obj['func_type']
         )
-        print("************")
-        print(send_obj)
     send(send_obj, broadcast=True)
 
 
@@ -271,15 +269,19 @@ def get_utility(utility_id):
     :param type: int
     """
 
-    utility = Utility().get(id)
+    utility = Utility().get(utility_id)
     context = dict(
         utility=utility
     )
     return render_template('show_utility.html', **context)
 
 
-@app.route('/add/utility/<user_id>', methods=['GET'])
-def new_utility(user_id):
+@app.route('/add/utility', methods=['GET'])
+def new_utility():
+    """ Render template to add new utility.
+    """
+
+    user_id = flask_session.get('user_id')
     user = User().get(user_id)
     context = {}
     context['user'] = user
@@ -291,18 +293,20 @@ def add_new_utility():
     """ Adds a new utility to Xena's db.
     """
     
+    user_id = flask_session.get('user_id')
     if request.method == 'POST':
-        data = request.form()
+        data = request.form
         new_utility = Utility(
             name=data['name'],
             description=data['description'],
-            utility_user_utility_id=data['user_id'],
+            image=data['image'],
+            user_utility_id=user_id,
             address=data['address']
         )
         new_utility.create()
         return redirect(
             url_for(
-                'app.get_common_post'
+                'get_all_utilities'
             )
         )
 
@@ -342,9 +346,9 @@ def add_utility_item():
     """
 
     if request.method == 'POST':
-        data = request.form()
+        data = request.form
         utility_item = UtilityItem(
-            utility_item_id=data['utility_id'],
+            utility_item_id=data['utility_item_id'],
             name=data['name'],
             description=data['description'],
             image=data['image'],
@@ -354,14 +358,14 @@ def add_utility_item():
 
         return redirect(
             url_for(
-                'app.get_utility',
-                utility_id=data['utility_id']
+                'get_utility',
+                utility_id=data['utility_item_id']
             )
         )
 
 
 # defines views to buy utility Item
-@app.route('/buy_utility_item/<utility_id>/<item_id>/<user_id>', methods=['GET'])
+@app.route('/buy_utility_item/<utility_id>/<item_id>', methods=['GET'])
 def buy_utility_item(utility_id, item_id, user_id):
     """ Buys the utility item for the user.
     
@@ -369,10 +373,9 @@ def buy_utility_item(utility_id, item_id, user_id):
     :param type: int
     :param item_id: Id of the item requested by the user.
     :param type: int
-    :param user_id: Id of the logged in user.
-    :param type: int
     """
 
+    user_id = flask_session.get('user_id')
     user_item_rel = UtilityItemUser(
         user_id='user_id',
         utility_id='utility_id',
@@ -385,18 +388,19 @@ def buy_utility_item(utility_id, item_id, user_id):
     user_wallet.save()
     return redirect(
             url_for(
-                'app.get_utility',
+                'get_utility',
                 utility_id=request.json['utility_id']
             )
         )
 
 
 # defines view to allow Utility owner see sold utility
-@app.route('/user/utility/<user_id>', methods=['GET'])
-def get_user_owned_utility(user_id):
+@app.route('/user/utility', methods=['GET'])
+def get_user_owned_utility():
     """ Returns User owned Utilities
     """
 
+    user_id = flask_session.get('user_id')
     utilities = Utility().get_user_utility(user_id)
     context = dict(
         utilities=utilities

@@ -1,0 +1,47 @@
+<html>
+
+<head>
+    <title>Conduent Blockchain Hackathon 2019</title>
+    <link rel="stylesheet" href="/static/css/blog.css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-sm">
+        <a class="navbar-brand" href="{{ url_for('home') }}"> <h3>Xena</h3> </a>
+        <a href="{{ url_for('get_all_utilities') }}"><h6>Utilities</h6></a>
+        <a href="#"><h6>Login</h6></a>
+    </nav>
+
+    <div class="col-sm-12" style="display: flex; justify-content: space-evenly; flex-flow: wrap;">
+        {% if utilities %}
+            {% for utility in utilities %}
+                <div class="card" style="width:300px">
+                    <img class="card-img-top" src="static/images/project/1.jpg" alt="Card image" style="width:100%">
+                    <div class="card-body">
+                        <h4 class="card-title">{{ utility.name }}</h4>
+                        <p class="card-text">{{ utility.description }}</p>
+                        <div>
+                            <button class="btn" onclick="explore_utility({{ utility.id }})">Explore</button>
+                            <button class="btn" onclick="add_utility_item({{ utility.id }})">Add item</button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</body>
+
+<script>
+
+    function explore_utility(e){
+        window.location.href = "http://localhost:5000/utilities/"+e;
+    }
+
+    function add_utility_item(e){
+        window.location.href = "http://localhost:5000/add/utility-item/"+e;
+    }
+
+</script>
+</html>
+
