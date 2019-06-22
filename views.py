@@ -12,6 +12,9 @@ created_at     : 2019-06-20
 import os
 import json
 
+#from default modules import package
+from datetime import datetime
+
 # import modules from flask
 from flask import jsonify, flash
 from flask import session as flask_session
@@ -52,6 +55,14 @@ def home():
 
 
 # define User registerations views
+@app.route('/register', methods=['GET'])
+def register():
+    """  Renders register user template.
+    """
+    
+    return render_template('register.html')
+
+
 @app.route('/register/user/new', methods=['POST'])
 def register_user():
     """ Registers a new user to Xena's User model.
@@ -60,7 +71,8 @@ def register_user():
     """
 
     if request.method == 'POST':
-        data = request.form()  # access form data from request.
+        data = request.form  # access form data from request.
+        print(data)
         new_user = User(
             username=data['username'],
             password=data['password'],
@@ -71,10 +83,8 @@ def register_user():
         new_user.create()  # create new user in DB.
         context = {}
         context['user'] = new_user
+        flask_session['user_id'] = new_user.id
         return render_template('user_details.html', **context)
-    
-    else:
-        return "Method not accessible."
 
 
 @app.route('/register/user/details', methods=['POST'])
@@ -85,20 +95,20 @@ def register_user_details():
     """
 
     if request.method == 'POST':
-        data = request.form()  # access form data from request.
+        data = request.form  # access form data from request.
         user_detail = UserDetail(
             user_detail_id=data['user_id'],
             age=data['age'],
             first_name=data['firstname'],
             last_name=data['lastname'],
             address=data['address'],
-            contact_num=data['contact_number']
+            contact_num=data['contact_num']
         )
         user_detail.create()  # add details for the specified user.
 
         return redirect(
             url_for(
-                'app.get_common_post'
+                'get_common_posts'
             )
         )
 
@@ -109,20 +119,23 @@ def get_common_posts():
     """ Get all Posts from Xena's db.
     """
 
+    user_id = flask_session.get('user_id')
+    print(user_id)
+    user = User().get(user_id)
     posts = Post().get_all()
     context = {}
     context['posts'] = posts
+    context['user'] = user
+    print(context)
     return render_template('common_post.html', **context)
 
 
-@app.route('/post/add/<user_id>', methods=['GET'])
-def new_post(user_id):
+@app.route('/post/add', methods=['GET'])
+def new_post():
     """ Renders template to add new post.
-
-    :param id: id of the user adding the post.
-    :param type: int
     """
     
+    user_id = flask_session.get('user_id')
     user = User().get(user_id)
     context = {}
     context['user'] = user
@@ -134,18 +147,20 @@ def add_new_post():
     """ Adds new post to Xena's db.
     """
 
+    user_id = flask_session.get('user_id')
     if request.method == 'POST':
-        data = request.form()  # access form data from request.
+        data = request.form  # access form data from request.
         post = Post(
-            user_post_id=data['id'],
+            user_post_id=user_id,
             title=data['title'],
             image=data['image'],
-            content=data['content']
+            content=data['content'],
+            posted_on=datetime.now()
         )
         post.create()
         return redirect(
             url_for(
-                'app.get_common_post'
+                'get_common_posts'
             )
         )
 
@@ -232,7 +247,7 @@ def add_new_utility():
         new_utility = Utility(
             name=data['name'],
             description=data['description'],
-            user_utility_id=data['user_id'],
+            utility_user_utility_id=data['user_id'],
             address=data['address']
         )
         new_utility.create()
@@ -258,7 +273,7 @@ def register_new_utility():
 
 
 # define views for UtilityItem
-@app.route('add/utility-item/<utility_id>', methods=['GET'])
+@app.route('/add/utility-item/<utility_id>', methods=['GET'])
 def utility_item(utility_id):
     """ Renders template to add new utility item.
 
@@ -272,7 +287,7 @@ def utility_item(utility_id):
     return render_template('add_utility_item.html', **context)
 
 
-@app.route('add/utility-item/new', methods=['POST'])
+@app.route('/add/utility-item/new', methods=['POST'])
 def add_utility_item():
     """ Add new utility item for the utility.
     """
@@ -350,3 +365,6 @@ def get_utility_item_sold_info(utility_id):
         items=items_sold
     )
     return render_template('utility_items_sold.html', **context)
+
+if __name__ == "__main__":
+    app.run()

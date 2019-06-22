@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <title>Conduent Hackathon 2019</title>
+    <link rel="stylesheet" href="/static/css/blog.css">
+    <link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
+    <script type="text" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.4/socket.io.min.js" ></script>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-sm">
+        <a class="navbar-brand" href="{{ url_for('home') }}"> <h3>Xena</h3> </a>
+        <a href="{{ url_for('new_post') }}"><h6>Add Post</h6></a>
+        <a href="#"><h6>Logged in as {{user.username}}</h6></a>
+</nav>
+
+{% for post  in posts %}
+    <div class="container col-sm-8">    
+        <div class="card blog-card">
+            <div class="card-body">
+                <div class="blog-header">
+                    <h3>{{ post.title }}</h3>
+                </div>
+                <div class="blog-info">
+                    <p class="posted-on"> <i> Posted by {{ post.user.username }} on {{ post.posted_on }}</i> </p>
+                    <p class="card-text">{{ post.content }}</p>
+                </div>
+            </div>
+            <div style="align-self:flex-end; margin-right:2vw;">
+                <p class="post-upvote">{{ post.upvote }}</p>
+                <i class='far fa-arrow-alt-circle-up' style='font-size:24px; cursor: pointer;' onclick="upvote({{ post.id }})"></i>
+                <i class='far fa-arrow-alt-circle-down' style='font-size:24px; cursor: pointer;' onclick="downvote({{ post.id }})"></i>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+<script>
+    
+    // define sockets.
+    var socket = io.connect('http://127.0.0.1:5000');
+    
+    socket.on('message', function(msg){
+        $('.post-upvote').html(msg);
+    });
+
+    function upvote(e){
+        var message = {};
+        message['post_id'] = e;
+        message['type'] = 'upvote';
+        socket.send(message);
+    }
+
+    function downvote(e){
+        var message = {};
+        message['post_id'] = e;
+        message['type'] = 'downvote';
+        socket.send(message);
+    }
+
+</script>
+
+</body>
+</html>

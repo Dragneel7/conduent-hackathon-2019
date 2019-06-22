@@ -223,7 +223,7 @@ class UserWallet(Base):
 
     #define UserWallet model methods
     def __init__(self, **kwargs):
-        super(UserWallet).__init__(**kwargs)
+        super(UserWallet, self).__init__(**kwargs)
     
     def get(self, id):
         """ Returns user wallet info based on id.
@@ -287,7 +287,7 @@ class Post(Base):
 
     # define Post model methods
     def __init__(self, **kwargs):
-        super(Post).__init__(**kwargs)
+        super(Post, self).__init__(**kwargs)
 
     def create(self):
         """ Saves new post to db.
@@ -408,7 +408,7 @@ class Utility(Base):
         back_populates='user_utility'
     )
     utility_item = relationship(
-        'Utility',
+        'UtilityItem',
         back_populates='utility',
         lazy=True,
         uselist=False

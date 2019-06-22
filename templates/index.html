@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>     
+  
+        <!-- TITLE OF SITE --> 
+        <title>Conduent BlockChain Hackathon 2019</title>
+  
+        <!-- Meta -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+        <!-- FAV AND TOUCH ICONS   -->
+        <link rel="icon" href="static/images/favicon.ico">
+        <link rel="apple-touch-icon" href="static/images/apple-touch-icon.png">
+        <link rel="apple-touch-icon" sizes="72x72" href="static/images/apple-touch-icon-72x72.png">
+        <link rel="apple-touch-icon" sizes="114x114" href="static/images/apple-touch-icon-114x114.png">
+
+        <!-- GOOGLE FONTS -->
+        <link href='https://fonts.googleapis.com/css?family=Lato:400,100,300,700' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Poppins:400,300,500,600' rel='stylesheet' type='text/css'>
+
+        <!-- BOOTSTRAP CSS -->
+        <link rel="stylesheet" href="static/bootstrap/css/bootstrap.min.css">
+
+        <!-- Image Slider -->
+        <link rel="stylesheet" href="static/css/plagin-css/plagin.css">
+
+        <!-- FONT ICONS -->
+        <link rel="stylesheet" href="static/icons/toicons/css/styles.css">
+
+        <!--   COUSTOM CSS link  -->
+        <link rel="stylesheet" href="static/css/style.css">
+        <link rel="stylesheet" href="static/css/responsive.css">
+
+
+        <!--[if lt IE 9]>
+            <script src="static/js/plagin-js/html5shiv.js"></script>
+            <script src="static/js/plagin-js/respond.min.js"></script>
+        <![endif]-->
+
+    </head>
+    <body class="">
+
+
+        <!-- Start: Navbar Area
+        ============================= -->
+        <header id="header" class="okayNav-header navbar-fixed-top main-navbar-top">
+            <div class="container">
+                <div class="row">
+                    
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+
+                        <a class="okayNav-header__logo navbar-brand" href="#">
+                            <img src="static/images/logo.png" alt="" class="logo-1 img-responsive">
+                            <img src="static/images/logo-dark.png" alt="" class="logo-2 img-responsive">
+                        </a>
+
+                    </div> <!-- End: .col-xs-3 -->
+                    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-6">
+
+                        <nav role="navigation" class="okayNav pull-right" id="js-navbar-menu">
+                            <ul id="navbar-nav" class="navbar-nav">
+                                <li><a class="btn-nav" href="#features">Login</a></li>
+                                <li><a class="btn-nav" href="{{ url_for('register_user') }}">Register</a></li>
+                            </ul>
+                        </nav>
+
+                    </div> <!-- End: .col-xs-9 -->
+                </div> <!-- End: .row -->
+            </div> <!-- End: .container -->
+        </header><!-- /header -->
+        <!-- End: Navbar Area
+        ============================= -->
+
+
+        
+        <!-- Start: Header Section
+        ================================ -->
+        <section class="header-section-1 bg-image-1 header-js" id="header" >
+            <div class="overlay-color">
+                <div class="container">
+                    <div class="row section-separator">
+
+                        <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+                            <div class="part-inner text-center">
+
+                                <!--  Header SubTitle Goes here -->
+                                <h1 class="title">Welcome to Xena - The smart city</h1> 
+
+                                <div class="detail">
+                                    <p>Join the revolution and be a part of the better and harmonious society.</p>
+                                </div>
+
+                                <!-- Button Area -->
+                                <div class="btn-form btn-scroll">
+                                    <a href="{{ url_for('register_user') }}" class="btn btn-fill right-icon">Register <i class="icon icons8-advance"></i></a>
+                                </div>
+
+                            </div>
+                        </div> <!-- End: .part-1 -->
+
+                    </div> <!-- End: .row -->
+                </div> <!-- End: .container -->
+            </div> <!-- End: .overlay-color -->
+        </section>
+        <!-- End: Header Section
+        ================================ -->
+
+
+
+
+        <!-- Start: Features Section 7
+        ====================================== -->
+        <section class="features-section-7 content-half background-light" >
+
+            <div class="container-half container-half-left background-light"></div>
+            <div class="container-half container-half-right cover" style="background-image: url(static/images/background-4.jpg);"></div>
+
+            <div class="container">
+                <div class="row section-separator text-left">
+
+                    <div class="col-md-6">
+                        <div class="inner">
+
+                            <h2 class="section-heading">Xena inspires a society that looks after one another, helping themselves, other and the society as a whole.</h2>
+                            <div class="detail">
+                                <p>With Xena's advanced fact verification and rewardment system, your every helpful deed is rewarded manifolds.</p>
+
+                                <p>Promoting a society that helps one another is what Xena promises to all its residents.</p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+        <!-- End: Features Section 7
+        ================================ -->
+
+
+
+
+        <!-- Start: Features Section 1
+        ====================================== -->
+        <section class="features-section-1 relative background-semi-dark" id="features">
+            <div class="container">
+                <div class="row section-separator">
+
+                    <!-- Start: Section Header -->
+                    <div class="section-header col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+
+                        <h2 class="section-heading">Xena's Features</h2>
+                        <p class="sub-heading">Xena provides it's user with a platform to share themselves, which is presented to every user registered with Xena, and other users can decide to upvote or downvote which are then converted to social score using statistical algorithms.</p>
+
+                    </div>
+                    <!-- End: Section Header -->
+
+                    <div class="clearfix"></div>
+
+                    <div class="col-xs-12 features-item">
+                        <div class="row">
+                            
+                            <div class="each-features text-center col-md-4 col-sm-6 col-xs-12">
+                                <div class="inner background-light">
+                            
+                                    <i class="icon features-icon icons8-clock"></i>
+                                    <h6 class="title">Quick Reponse</h6>
+                                    <div class="detail">
+                                        <p>Quick Publish and response to various User Posts.</p>
+                                    </div>
+
+                                </div> <!-- End: .inner -->
+                            </div> <!-- End: .each-features -->
+
+                            <div class="each-features text-center col-md-4 col-sm-6 col-xs-12">
+                                <div class="inner background-light">
+                            
+                                    <i class="icon features-icon icons8-bullish"></i>
+                                    <h6 class="title">Dynamic Growth</h6>
+                                    <div class="detail">
+                                        <p>Dynamic growth of User's social value and virtual value using z-statistical analysis.</p>
+                                    </div>
+
+                                </div> <!-- End: .inner -->
+                            </div> <!-- End: .each-features -->
+
+                            <div class="each-features text-center col-md-4 col-sm-6 col-xs-12">
+                                <div class="inner background-light">
+                            
+                                    <i class="icon features-icon icons8-calendar"></i>
+                                    <h6 class="title">24/7 functionality</h6>
+                                    <div class="detail">
+                                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet.</p>
+                                    </div>
+
+                                </div> <!-- End: .inner -->
+                            </div> <!-- End: .each-features -->
+
+                            <div class="each-features text-center col-md-4 col-sm-6 col-xs-12">
+                                <div class="inner background-light">
+                            
+                                    <i class="icon features-icon icons8-coins"></i>
+                                    <h6 class="title">Virtual Currency</h6>
+                                    <div class="detail">
+                                        <p>Your social score is converted to your Virtual Currency.</p>
+                                    </div>
+
+                                </div> <!-- End: .inner -->
+                            </div> <!-- End: .each-features -->
+
+                            <div class="each-features text-center col-md-4 col-sm-6 col-xs-12">
+                                <div class="inner background-light">
+                            
+                                    <i class="icon features-icon icons8-wine-glass"></i>
+                                    <h6 class="title">Partnered Utilities</h6>
+                                    <div class="detail">
+                                        <p>Use your virutal currency to get subsidies on products sold by Partnered Utilities.</p>
+                                    </div>
+
+                                </div> <!-- End: .inner -->
+                            </div> <!-- End: .each-features -->
+
+                            <div class="each-features text-center col-md-4 col-sm-6 col-xs-12">
+                                <div class="inner background-light">
+                            
+                                    <i class="icon features-icon icons8-privacy"></i>
+                                    <h6 class="title">Follows Law</h6>
+                                    <div class="detail">
+                                        <p>Promotes the society to be law abiding.</p>
+                                    </div>
+
+                                </div> <!-- End: .inner -->
+                            </div> <!-- End: .each-features -->
+
+                        </div>
+                    </div>
+
+                </div> <!-- End: .row -->
+            </div> <!-- End: .container -->
+        </section>
+        <!-- End: Features Section 1
+        ======================================-->
+
+
+        <!-- Start: Footer Section 1
+        ================================== -->
+        <footer class="footer-section background-dark">
+            <div class="container">
+                <div class="row section-separator text-center">
+
+                    <div class="copyright">
+                        <p>Copyright: Conduent@2019, All rights reserved.</p>
+                    </div>
+
+                </div><!-- End: .section-separator  -->
+            </div> <!-- End: .container  -->
+        </footer>
+        <!-- End: Footer Section 1
+        ================================== -->
+
+
+
+
+        
+        <!-- SCRIPTS 
+        ========================================-->
+        <script src="static/js/plagin-js/jquery-1.11.3.js"></script>
+        <script src="static/bootstrap/js/bootstrap.min.js"></script>
+        <script src="static/js/plagin-js/plagin.js"></script>
+
+        <!-- Custom Script 
+        ==========================================-->
+        <script src="static/js/custom-scripts.js"></script>
+
+    </body>
+
+</html>
