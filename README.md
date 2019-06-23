@@ -30,10 +30,7 @@ Create 2 databased with the names a conduent and conduent_blockchain.
 
 To see how to create a database in postgres visit the following [link](https://www.linode.com/docs/databases/postgresql/how-to-install-postgresql-on-ubuntu-16-04/)
 
-### Export your Database user credentials as env variables
-
-* export DB_OWNER=<DATABASE_OWNER>
-* export DB_PASSWORD=<DATABASE_PASSWORD>
+### Modify SqlAlchemy engines with your db_owner and db_password
 
 ### Docker based deployement
 
